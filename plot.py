@@ -79,50 +79,42 @@ def plot_confusion_matrix(savepath, labels, predictions, title):
 
 def plot_contours():
     mfcc_pairs = [[0, 1], [0, 2], [1, 2]]
+    cov_types = ['diag', 'tied', 'tied_diag']
+    cov_names = ['Diagonal', 'Tied', 'Tied Diagonal']
 
     classifier = DigitClassifier()
 
-    classifier.get_gmm_list(kmeans=True, covariance_type='diag', n_components=10)
-    classifier.predict(test=True)
-    plot_pdf("figures/pdf_contour_kmeans_diag_", classifier, True, 'diag', mfcc_pairs)
+    for i in range(3):
+        cov_type = cov_types[i]
+        cov_name = cov_names[i]
+        classifier.get_gmm_list(kmeans=True, covariance_type=cov_type, n_components=10)
+        classifier.predict(test=True)
+        plot_pdf("figures/pdf_contour_kmeans_{}_".format(cov_type), classifier, True, cov_type, mfcc_pairs)
 
-    plot_confusion_matrix("figures/confusion_matrix_diag_kmeans", classifier.test_labels, classifier.test_predictions,
-                          "Confusion Matrix for GMM with K-Means and Diagonal Covariance")
+        plot_confusion_matrix("figures/confusion_matrix_{}_kmeans".format(cov_type), classifier.test_labels, classifier.test_predictions,
+                            "Confusion Matrix for GMM with K-Means and {} Covariance".format(cov_name))
+        
+        classifier.get_gmm_list(kmeans=False, covariance_type=cov_type, n_components=10)
+        classifier.predict(test=True)
+        plot_pdf("figures/pdf_contour_em_{}_".format(cov_type), classifier, False, cov_type, mfcc_pairs)
 
-    classifier.get_gmm_list(kmeans=False, covariance_type='diag', n_components=10)
-    classifier.predict(test=True)
-    plot_pdf("figures/pdf_contour_em_diag_", classifier, False, 'diag', mfcc_pairs)
+        plot_confusion_matrix("figures/confusion_matrix_{}_em".format(cov_type), classifier.test_labels, classifier.test_predictions,
+                            "Confusion Matrix for GMM with EM and {} Covariance".format(cov_name))
 
-    plot_confusion_matrix("figures/confusion_matrix_diag_em", classifier.test_labels, classifier.test_predictions,
-                          "Confusion Matrix for GMM with EM and Diagonal Covariance")
+        # with gender
+        classifier.get_gmm_list(kmeans=True, covariance_type=cov_type, n_components=10, use_gender=True)
+        classifier.predict(test=True)
+        plot_pdf("figures/pdf_contour_kmeans_{}_gender_".format(cov_type), classifier, True, cov_type, mfcc_pairs)
 
-    classifier.get_gmm_list(kmeans=True, covariance_type='tied', n_components=10)
-    classifier.predict(test=True)
-    plot_pdf("figures/pdf_contour_kmeans_tied_", classifier, True, 'tied', mfcc_pairs)
+        plot_confusion_matrix("figures/confusion_matrix_{}_kmeans_gender".format(cov_type), classifier.test_labels, classifier.test_predictions,
+                            "Confusion Matrix for GMM with K-Means, {} Covariance, and Gender".format(cov_name))
+        
+        classifier.get_gmm_list(kmeans=False, covariance_type=cov_type, n_components=10, use_gender=True)
+        classifier.predict(test=True)
+        plot_pdf("figures/pdf_contour_em_{}_gender_".format(cov_type), classifier, False, cov_type, mfcc_pairs)
 
-    plot_confusion_matrix("figures/confusion_matrix_tied_kmeans", classifier.test_labels, classifier.test_predictions,
-                          "Confusion Matrix for GMM with K-Means and Tied Covariance")
-
-    classifier.get_gmm_list(kmeans=False, covariance_type='tied', n_components=10)
-    classifier.predict(test=True)
-    plot_pdf("figures/pdf_contour_em_tied_", classifier, False, 'tied', mfcc_pairs)
-
-    plot_confusion_matrix("figures/confusion_matrix_tied_em", classifier.test_labels, classifier.test_predictions,
-                          "Confusion Matrix for GMM with EM and Tied Covariance")
-
-    classifier.get_gmm_list(kmeans=True, covariance_type='tied_diag', n_components=10)
-    classifier.predict(test=True)
-    plot_pdf("figures/pdf_contour_kmeans_tied_diag_", classifier, True, 'tied_diag', mfcc_pairs)
-
-    plot_confusion_matrix("figures/confusion_matrix_tied_diag_kmeans", classifier.test_labels, classifier.test_predictions,
-                          "Confusion Matrix for GMM with K-Means and Tied Diagonal Covariance")
-
-    classifier.get_gmm_list(kmeans=False, covariance_type='tied_diag', n_components=10)
-    classifier.predict(test=True)
-    plot_pdf("figures/pdf_contour_em_tied_diag_", classifier, False, 'tied_diag', mfcc_pairs)
-
-    plot_confusion_matrix("figures/confusion_matrix_tied_diag_em", classifier.test_labels, classifier.test_predictions,
-                          "Confusion Matrix for GMM with EM and Tied Diagonal Covariance")
+        plot_confusion_matrix("figures/confusion_matrix_{}_em_gender".format(cov_type), classifier.test_labels, classifier.test_predictions,
+                            "Confusion Matrix for GMM with EM, {} Covariance, and Gender".format(cov_name))
 
 
 def plot_mfccs(savepath):
@@ -180,5 +172,5 @@ def scatter_plot_mfccs(savepath):
 
 if __name__ == '__main__':
     plot_contours()
-    plot_mfccs('figures/mfcc_pairs')
-    scatter_plot_mfccs("figures/mfcc_scatter")
+    # plot_mfccs('figures/mfcc_pairs')
+    # scatter_plot_mfccs("figures/mfcc_scatter")
