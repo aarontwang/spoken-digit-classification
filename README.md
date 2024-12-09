@@ -1,1 +1,1 @@
-# spoken-digit-classification
+# ECE 480 Course Project: Spoken Digit Classification
